@@ -1,0 +1,119 @@
+---
+title: 'Homework #2'
+author: "Mallory Lai"
+date: "October 30, 2016"
+output: html_document
+---
+
+
+1.
+
+
+2. Setting up the problem:
+```{r, message = F, warning=F}
+library(markovchain)
+library(igraph)
+```
+
+```{r}
+# Create transition matrix
+m <- matrix(c(0, .5, .5, 0, 0,
+              0, .25, .25, .5, 0,
+              0, .5, .5, 0, 0, 
+              0, 0, 0, .25, .75,
+              0, 0, 0, .5, .5), 
+            ncol = 5, byrow = T)
+
+# Create a discrete time Markov Chain using the package "markovchain".
+MC1 <- as(m, "markovchain")
+
+# Graph MC1. 
+plot(MC1)
+```
+
+a) Classify the states. 
+```{r}
+# Examine summary of MC1
+summary(MC1)
+```
+
+b) Determine all the invariant probabilities. 
+```{r}
+steadyStates(MC1)
+```
+
+
+c) What is the probability to be in {4,5} starting from 1. 
+```{r}
+MC1[1, c(4,5)]
+```
+
+There is a 0% probability of moving to {4,5} from 1. The chain can only move to
+2 or 3 from 1. In terms of a steady state solution, however, there is a 100% of
+being in {4,5} since all other states are transient and {4,5} is closed. 
+
+3.
+
+a.
+
+```{r}
+# Create vertices of triangle.
+nodes <- c(1, 2, 3)
+
+# State probabilities between vertices. 
+links <- c("1-p", "p")
+
+
+
+```
+
+b.
+
+```{r}
+# Create transition matrix.  
+  (m <- matrix(c(0, "1-p", "p",
+              "p", 0, "1-p",
+              "1-p", "p", 0), 
+            ncol = 3, byrow = T))
+```
+
+c. Since the R package cannot handle variables, only numerical values, I will
+use 10 random values between 1 and 10 to show that the invariant probability 
+does not depend on the value of p. 
+```{r}
+# Create a vector of probabilities for p to take on. 
+p <- runif(10)
+
+# Initialize an empty matrix to hold invariant probabilities for each p. 
+invariantProbabilities <- matrix(NA, nrow = length(p), ncol = 3)
+
+# Create a Markov Chain and calculate invariant probabilities for each p.
+for(i in 1:length(p))
+{
+  
+# Create transition matrix.  
+  m <- matrix(c(0, 1-p[i], p[i],
+              p[i], 0, 1-p[i],
+              1-p[i], p[i], 0), 
+            ncol = 3, byrow = T)
+
+# Create a discrete time Markov Chain using the package "markovchain".
+MC <- as(m, "markovchain")
+
+# Determine invariant probabilities.
+invariantProbabilities[i, ] <- steadyStates(MC)
+
+}
+
+invariantProbabilities
+```
+
+The invariant probabilities are \Pi = {1/3, 1/3, 1/3}.
+
+```{r}
+
+```
+
+
+
+
