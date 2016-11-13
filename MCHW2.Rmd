@@ -2,18 +2,31 @@
 title: 'Homework #2'
 author: "Mallory Lai"
 date: "October 30, 2016"
-output: html_document
+output: pdf_document
 ---
-
-
-1.
-
-
-2. Setting up the problem:
 ```{r, message = F, warning=F}
 library(markovchain)
 library(igraph)
+library(knitr)
 ```
+
+
+1.
+p~01~ = 1; 100% probability of going from 0 to 1. Therefore, p~00~ = 0 for all n.  
+p~1,i+1~ = 1; 100% probability of going to either i+1 or i-1 from i. No other possibilities!  
+$\frac{p~i,i+1~}{p~i,i-1}= (\frac{i+1}{i})^2$ Since the numerator is greater 
+than the denominator, the chain has a tendency to move to the right. 
+```{r}
+# Create graph using igraph.
+# Set seed to ensure graph doesn't change. 
+set.seed(3)
+g1 <- graph(c('i','i+1', 'i','i-1')) %>% 
+  set_edge_attr("label", value = c('numerator', 'denominator'))
+plot(g1, vertex.size = 50, vertex.color = "green", edge.arrow.size = .5)
+
+```
+
+2. Setting up the problem:
 
 ```{r}
 # Create transition matrix
@@ -27,8 +40,10 @@ m <- matrix(c(0, .5, .5, 0, 0,
 # Create a discrete time Markov Chain using the package "markovchain".
 MC1 <- as(m, "markovchain")
 
+# Set seed to prevent graph from changing. 
+set.seed(1)
 # Graph MC1. 
-plot(MC1)
+plot(MC1, vertex.size = 20)
 ```
 
 a) Classify the states. 
@@ -36,12 +51,13 @@ a) Classify the states.
 # Examine summary of MC1
 summary(MC1)
 ```
+4 and 5 are both a closed and recurrent class. 1 is a transient class that can never be returned to once left. 2 and 3 are transient as well. 
 
 b) Determine all the invariant probabilities. 
 ```{r}
 steadyStates(MC1)
 ```
-
+The invariant probabilities are $\pi$ = {0, 0, 0, 0.4, 0.6}.
 
 c) What is the probability to be in {4,5} starting from 1. 
 ```{r}
@@ -57,26 +73,24 @@ being in {4,5} since all other states are transient and {4,5} is closed.
 a.
 
 ```{r}
-# Create vertices of triangle.
-nodes <- c(1, 2, 3)
-
-# State probabilities between vertices. 
-links <- c("1-p", "p")
-
-
+# Create graph using igraph.
+# Set seed to ensure graph doesn't change. 
+set.seed(2)
+g4 <- graph(c(1,2, 2,3, 3,1, 3,2, 2,1, 1,3)) %>%
+  set_edge_attr("label", value = c('1-p', '1-p', '1-p', 'p', 'p', 'p'))
+plot(g4, vertex.size = 50, vertex.color = "green", 
+edge.arrow.size = .5)
 
 ```
-
+  
 b.
-
-```{r}
-# Create transition matrix.  
-  (m <- matrix(c(0, "1-p", "p",
-              "p", 0, "1-p",
-              "1-p", "p", 0), 
-            ncol = 3, byrow = T))
-```
-
+$$P =
+ \begin{pmatrix}
+  0 & 1-p & p \\
+  p & 0 & 1-p \\
+  1-p & p & 0
+ \end{pmatrix}$$
+ 
 c. Since the R package cannot handle variables, only numerical values, I will
 use 10 random values between 1 and 10 to show that the invariant probability 
 does not depend on the value of p. 
@@ -105,15 +119,20 @@ invariantProbabilities[i, ] <- steadyStates(MC)
 
 }
 
-invariantProbabilities
+# Assign rownames that match with p value. 
+rownames(invariantProbabilities) <- round(p, digits = 2)
+# Assign column names that match with vertices. 
+colnames(invariantProbabilities) <- c(1, 2, 3)
+
+# Show invariant probabilities for all values of p. 
+kable(invariantProbabilities)
 ```
 
-The invariant probabilities are \Pi = {1/3, 1/3, 1/3}.
-
+The invariant probabilities are $\pi$ = {1/3, 1/3, 1/3}, regardless of the 
+starting value of p. 
+  
+d.   
 ```{r}
 
 ```
-
-
-
 
