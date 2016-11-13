@@ -8,7 +8,14 @@
 source("https://bioconductor.org/biocLite.R")
 biocLite("compcodeR")
 library(compcodeR)
+library(baySeq)
+library(edgeR)
+library(data.table)
 #------------------------------------------------------------------------------
+
+if(require("parallel")) cl <- makeCluster(8) else cl <- NULL
+
+##### Generate simulated data. #####
 
 # Generate synthetic data.
 sim <- generateSyntheticData(dataset = "D1", n.vars = 12500,
@@ -21,13 +28,85 @@ sim <- generateSyntheticData(dataset = "D1", n.vars = 12500,
                                    fraction.non.overdispersed = 0,
                                    output.file = "simD1.rds")
 
-# Summarize synthetic data.
-summarizeSyntheticDataSet(sim, output.filename = "simD1.html")
+# Note: sim@variable.annotations holds list of differentially expressed genes. 
 
-# Differential expression analysis
-runDiffExp(data.file = "simD1.rds",
-           result.extent = "baySeq", Rmdfunction = "baySeq.createRmd",
-           output.directory = ".",
-           norm.method = "edgeR",
-           equaldisp = TRUE, distr.choice = "NB")
+# Store differentially expressed count matrix in a "simGenes" matrix. 
+simGenes <- sim@count.matrix
+
+# Store gene annotations in "varAnnotations" matrix. 
+varAnnotations <- sim@variable.annotations
+
+# Store sample annotations in "sampAnnotations" matrix. 
+sampAnnotations <- sim@sample.annotations
+
+##### baySeq analysis #####
+
+# Create count data object. 
+countData <- new('countData', data = simGenes, replicates = sampAnnotations$condition, 
+                 groups = list(NDE = rep(1, length(sampAnnotations$condition)), 
+                               DE = sampAnnotations$condition))
+
+# Get libsizes. 
+libsizes(countData) <- getLibsizes(countData, estimationType = 'QL', cl=cl)
+
+# Get priors. 
+countData <- getPriors.NB(countData, samplesize =12500, 
+                                  equalDispersions = TRUE, estimation = 'QL', cl = cl)
+
+# Get likelihoods. 
+countData <- getLikelihoods(countData, cl=cl, verbose = FALSE)
+
+##### Compare results #####
+
+# Find the top counts for differentially expressed genes. 
+de <- topCounts(countData, group = "DE", FDR = .05, number = 1300)
+
+# Convert the top counts matrix into a data table, keeping only the rownames, 
+# Likelihood, False Discovery Rate, and Ordering.  
+de <- data.table(rownames(de), de$Likelihood, de$FDR.DE, de$ordering)
+
+# Rename the columns appropriately. 
+colnames(de) <- c("Gene", "Likelihood", "FDR", "Ordering")
+
+# Set a key on the de datatable for gene name. 
+setkey(de, Gene)
+
+# Convert the variable annotations for Up-and-Downregulated genes into a datatable. 
+deAnnotations <- data.table(sim@variable.annotations$upregulation, 
+                     sim@variable.annotations$downregulation, 
+                     rownames(sim@variable.annotations))
+# Rename the columns appropriately. 
+colnames(deAnnotations) <- c("Upregulated", "Downregulated", "Gene")
+
+# Set a key on the deAnnotations datatable for gene name. 
+setkey(deAnnotations, Gene)
+
+# Align gene annotations with differentially expressed genes with a table join. 
+shared <- deAnnotations[detab]
+
+# Calculate the proportion of top counts compared to actual number
+# of differentially expressed genes. 
+dim(de)[1]/(sim@info.parameters$n.diffexp)
+
+# Calculate the proportion of differentially expressed genes that 
+# were correctly identified as being up or downregulated. 
+(sum(shared$Upregulated==1 & shared$Ordering=="2>1")+
+  sum(shared$Downregulated==1 & shared$Ordering=="1>2"))/dim(shared)[1]
+
+# Calculate the proportion of correctly identified differentially expressed genes 
+# to the actual number of differentially expressed genes. 
+(sum(shared$Upregulated==1 & shared$Ordering=="2>1")+
+  sum(shared$Downregulated==1 & shared$Ordering=="1>2"))/(sim@info.parameters$n.diffexp)
+
+
+
+
+
+
+
+
+
+
+
+
 
