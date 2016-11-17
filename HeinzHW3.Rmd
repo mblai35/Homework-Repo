@@ -1,0 +1,112 @@
+---
+title: "HW3"
+author: "Mallory Lai"
+date: "11/7/2016"
+fontsize: 12pt
+geometry: margin=1in
+output: pdf_document
+---
+This is my first time writing up a document with Latex using R Markdown. Please excuse the terrible formatting. 
+&nbsp; 
+
+1.a)  
+
+$\int_{-\infty}^{\infty} \frac{\partial f(v,t)}{\partial t} = 
+\int_{-\infty}^{\infty} \frac{\partial}{\partial v}\left[ \frac{v-V}{\tau_m} \right]
+f(v,t)+\frac{2e}{3 \tau_m}\frac{\partial^2f(v,t)}{\partial v^2}$
+
+$c_1 = \frac{v-V}{\tau_m}f + \frac{2e}{3 \tau_m}\frac{\partial}{\partial v}f$  
+
+Both terms on the right go to zero as $v\rightarrow \infty\therefore c_1 = 0$.
+
+$0 = \frac{v-V}{\tau_m}f + \frac{2e}{3 \tau_m}\frac{\partial}{\partial v}$   
+  
+Multiplying both sides by $\frac{\tau_m}{f}$ and integrating:  
+  
+$\int_{-\infty}^{\infty} (v-V)dv + \frac{2e}{3}\int_{-\infty}^{\infty}\frac{1}{f}\frac{\partial}{\partial v}dv$  
+  
+$0=\frac{1}{2}(v-V)^2 + \frac{2e}{3}ln(f) + c_2$  
+  
+$-\frac{1}{2}(v-V)^2 -c_2=\frac{2e}{3}ln(f)$  
+  
+$\frac{3e}{2}(-\frac{1}{2}(v-V)^2 -c_2)=ln(f)$  
+  
+$e^{\frac{3e}{2}(-\frac{1}{2}(v-V)^2 -c_2)}=f(v)$  
+  
+$e^{\frac{-3(v-V)^2}{4e}-\frac{3}{2e}c_2}=f(v)$  
+  
+$\frac{e^{\frac{-3(v-V)^2}{4e}}}{e^{\frac{3}{2e}c_2}}=f(v)$  
+  
+$\frac{1}{{e^{\frac{3}{2e}c_2}}}e^{\frac{-3(v-V)^2}{4e}}=f(v)$  
+  
+Notice that this is similar to the Normal PDF. Therefore, the normalization factor for the Normal (which guarantees the integral of the PDF = 1), should equal the normalization factor for our PDF.   
+  
+$\frac{1}{\sqrt(2\pi\frac{2}{3e})}=\frac{1}{e^{\frac{3}{2e}c_2}}$  
+  
+$\sqrt(2\pi\frac{2}{3e})=e^{\frac{3}{2e}c_2}$  
+  
+Solving in Wolfram Alpha: $c_2= ln(\sqrt(3\pi)\sqrt(\frac{1}{e}))\frac{2}{3}e$  
+  
+The final PDF should be:  
+  
+$f(v)=\frac{1}{\sqrt(2\pi\frac{2}{3e})}e^{\frac{-3(v-V)^2}{4e}}$  
+  
+b)  
+V is equal to the mean and $\frac{2e}{3}$ is equal to the variance. The stationary PDF f(v) does not depend on $\tau_m$ because our PDF is independent of time and $\tau_m$ is time-dependent. 
+
+2.a)  
+
+Let F = 0, G = -1/$\tau$, $D^{(1)}$=-(p-C)/$\tau$, $D^{(2)}$= D. 
+  
+Using equation 8.49a on pg. 308:  
+
+$\frac{d\left<P\right>}{dt}= \left<D^{(1)}\right>=\left<-(p-C)/\tau\right>$  
+$\left<P\right>=c_1 e^{\frac{-t}{\tau}}+C$  
+  
+Letting the initial population = p~0~:  
+  
+  p~0~ = k$e^{0}$+C  
+  p~0~= k+C  
+  k = p~0~-C   
+  
+  $\therefore\left<P\right>$= (p~0~-C)$e^{\frac{-t}{\tau}}$+C  
+  
+Comparing to equation 8.79a from pg. 315 since, asymptotically, $\alpha =  \left<P\right>$:  
+  
+  
+  $\frac{d}{dt}(\alpha - \left<P\right>)=\frac{-1}{\tau}(\alpha - \left<P\right>)$  
+    
+  $\alpha= \left<P\right>+(p_0-\left<P\right>)e^{\frac{-t}{\tau}}$  
+&nbsp;
+
+For $\left<\tilde{P^2}\right>$:    
+
+  $\frac{d}{dt}\left<\tilde{P^2}\right>=\frac{-2}{\tau}\left<\tilde{P^2}\right>+2D$  
+
+Using equation 8.78b from pg. 315 since asymptotically $\beta=\left<\tilde{P^2}\right>$:  
+
+  $\frac{d}{dt}(\beta - D)=\frac{-2}{\tau}(\beta - D)$
+  
+  $\beta= D-De^{\frac{-2t}{\tau}}$  
+  
+&nbsp;
+
+b) 
+  
+$\alpha= \left<P\right>+(p'-\left<P'\right>)\int_{0}^{t}e^{\frac{-t}{\tau}ds}$  
+  
+$\beta= \left<\tilde{P^2}\right>-(\left<\tilde{P'^2}\right>)2\int_{0}^{t}e^{\frac{-t}{\tau}ds}$  
+  
+$f(p,t|p',0) = \frac{1}{\sqrt(2\pi(\left<\tilde{P^2}\right>-(\left<\tilde{P'^2}\right>)2\int_{0}^{t}e^{\frac{-t}{\tau}ds}))}e^{\frac{-\left<P\right>+(p'-\left<P'\right>)\int_{0}^{t}e^{\frac{-t}{\tau}ds}}{2(\left<\tilde{P^2}\right>-(\left<\tilde{P'^2}\right>)2\int_{0}^{t}e^{\frac{-t}{\tau}ds})}}$  
+  
+c)  
+$f(p,t) = \frac{\int f(p',0)dp'}{\sqrt(2\pi\left<\tilde{P^2}\right>)}e^{-\frac{(p-\left<P\right>)^2}{2\left<\tilde{P^2}\right>}}$  
+  
+If t $\rightarrow \infty$ the PDF f(p,t) relaxes asymptotically to Normal PDF.  
+  
+$f(p,t) = \frac{1}{\sqrt(2\pi\left<\tilde{P^2}\right>)}e^{-\frac{(p-\left<P\right>)^2}{2\left<\tilde{P^2}\right>}}$   
+  
+d) 
+
+If D$\rightarrow0$ then $\left<\tilde{P^2}\right>\rightarrow0$, thus the asymptotic PDF becomes f(p,t)=$\delta (p-C)$
+
