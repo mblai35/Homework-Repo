@@ -114,7 +114,7 @@ colnames(resultsMatrix) <- c("Simulation", "NumberOfGenes", "DEgenes", "Upregula
                              "TopCounts/DE", "Correct/TopCounts", "Correct/DE")
 
 
-for (i in 1:50)
+for (i in 1:100)
 {
   
 # Store simulation number in results matrix. 
@@ -162,9 +162,11 @@ countData <- new('countData', data = simGenes, replicates = sampAnnotations$cond
 # Get libsizes. 
 libsizes(countData) <- getLibsizes(countData, estimationType = 'edgeR', cl=cl)
 
+# Specify prior density to be zero-inflated negative binomial distribution.
+densityFunction(countData) <- ZINBDensity
+
 # Get priors. 
-countData <- getPriors.NB(countData, samplesize =12500, 
-                          equalDispersions = TRUE, estimation = 'QL', cl = cl)
+countData <- getPriors.NB(countData,  cl = cl)
 
 # Get likelihoods. 
 countData <- getLikelihoods(countData, cl=cl, verbose = FALSE)
@@ -215,7 +217,7 @@ resultsMatrix[i, 7] <- (sum(shared$Upregulated==1 & shared$Ordering=="2>1")+
 
 
 write.csv(resultsMatrix, 
-          file = "C:/Users/Mallory/Documents/GitHub/Homework-Repo/compcodebaySeqOUT.csv")
+          file = "C:/Users/Mallory/Documents/GitHub/Homework-Repo/compcodebaySeqZINBout.csv")
 
 
 
