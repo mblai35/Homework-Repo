@@ -1,0 +1,48 @@
+---
+title: "Final Project"
+author: "Mallory Lai"
+date: "November 17, 2016"
+output: html_document
+---
+
+Error and assumptions made at this stage can affect downstream analyses. This effect hasn't been well quantified. 
+
+  baySeq is an R package that analyzes RNA-Seq data in a Bayesian context. By default, the method assumes a Negative Binomial (NB) distribution as its prior and calculates a posterior probability that each gene is differentially expressed. It is known to be computationally intensive and relatively conservative. On the upside, it's known to have a low False Discovery Rate (FDR).  
+
+  Although the default assumes a Negative Binomial distribution for its prior, baySeq allows the user to specify a Zero-Inflated Negative Binomial (ZINB) or Normal distribution instead. 
+
+#### Methods 
+  Simulated RNA-Seq data was produced using the compcodeR package and differential gene expression was analyzed using the baySeq package. Two hundred simulations were performed in total. Half of them were analyzed with a Negative Binomial prior in baySeq and the other half with a Zero-Inflated Negative Binomial. Total computation time was ~48 h with parallel processing using the parallel package in R.  
+
+  The compcodeR package was used to produce simulated RNA-Seq count data for two groups of five samples each. Counts are simulated from a Negative Binomial distribution with equal dispersion between the two groups. Simulated data was automatically filtered to exclude genes with values of zero among all five samples. No outliers were introduced.
+  
+  For each simulation, a random number of genes between 8,000 and 12,500 (the maximum allowed) was tested. A random percentage of those genes, between 5-30%, were selected to be differentially expressed. The fraction of differentially expressed genes to be upregulated was also randomized to be a proportion between .45 and .65.  
+
+  Differential gene expression was then analyzed using the baySeq package. The default Negative Binomial prior was used for half of the simulations and a Zero-Inflated Negative Binomial was used for the rest. Differentially expressed genes were classified as those with a false discovery rate less than 0.05. 
+  
+  The proportion of accurately classified genes for each simulation were then  ...............PDF
+
+
+  A filtered PDF was created for the NB and ZINB groups. The filter width was varied to minimize noise but being careful not to spread the PDF too much. 
+
+
+#### Results
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
