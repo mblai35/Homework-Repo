@@ -23,12 +23,14 @@ Error and assumptions made at this stage can affect downstream analyses. This ef
   The proportion of accurately classified genes for each simulation were then  ...............PDF
 
 
-  A filtered PDF was created for the NB and ZINB groups. The filter width was varied to minimize noise but being careful not to spread the PDF too much. 
+  A filtered PDF was created for the NB and ZINB groups. The filter width was varied to minimize noise without spreading the PDF out too much. 
 
 
 #### Results
 
+#### Discussion
 
+Further research should center on the accurate classification of differentially expression genes under a wider range of simulated conditions. Simulations with more than two groups and varying replicate numbers should be considered. The number of genes, the proportion of differentially expressed genes, and the fraction of upregulated genes should include a wider range of variables. Simulations which involve no differentially expressed genes and only upregulated or downregulated genes should be considered as well. Without such conditions, these results cannot be considered robust and generalizable to the conditions not tested. 
 
 
 

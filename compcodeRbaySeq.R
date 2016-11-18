@@ -1,9 +1,8 @@
-# compcodeR.R
+# compcodeRbaySeq.R
 # R version 3.2.2 (2015-08-14)
 # November 6, 2016. Mallory B. Lai.
-# Reviewed by: TODO (Mallory B. Lai) : Find reviewer to proofread
-# Practice using compcodeR package for simulating differential gene expression
-# data.
+# Simulating differential gene expression data to evaluate baySeq's ability to
+# detect differentially expressed genes. 
 #------------------------------------------------------------------------------
 source("https://bioconductor.org/biocLite.R")
 biocLite("compcodeR")
@@ -237,7 +236,7 @@ for (i in 1:100)
 
 # Write results table to a csv file. 
 write.csv(resultsMatrix, 
-          file = "C:/Users/Mallory/Documents/GitHub/Homework-Repo/compcodebaySeqZINBout.csv")
+          file = "compcodebaySeqZINBout.csv")
 
 
 
