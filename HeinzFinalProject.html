@@ -124,8 +124,8 @@ $(document).ready(function () {
 </div>
 
 
+<p>Although several statistical methods have been used to examine RNA-Seq count data, no standard method exists. baySeq is an R package that analyzes RNA-Seq data in a Bayesian context. By default, the method assumes a Negative Binomial (NB) distribution as its prior and calculates a posterior probability that each gene is differentially expressed. Although it’s known to have a low False Discovery Rate (FDR), it’s computationally intensive and relatively conservative.</p>
 <p>Error and assumptions made at this stage can affect downstream analyses. This effect hasn’t been well quantified.</p>
-<p>baySeq is an R package that analyzes RNA-Seq data in a Bayesian context. By default, the method assumes a Negative Binomial (NB) distribution as its prior and calculates a posterior probability that each gene is differentially expressed. It is known to be computationally intensive and relatively conservative. On the upside, it’s known to have a low False Discovery Rate (FDR).</p>
 <p>Although the default assumes a Negative Binomial distribution for its prior, baySeq allows the user to specify a Zero-Inflated Negative Binomial (ZINB) or Normal distribution instead.</p>
 <div id="methods" class="section level4">
 <h4>Methods</h4>
