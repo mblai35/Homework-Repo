@@ -70,7 +70,7 @@ for (i in 1:2)
                                  DE = sampAnnotations$condition))
   
   # Get libsizes. 
-  libsizes(countData) <- getLibsizes(countData, estimationType = 'QL', cl=cl)
+  libsizes(countData) <- getLibsizes(countData, estimationType = 'edgeR', cl=cl)
   
   # Get priors. 
   countData <- getPriors.NB(countData, samplesize =12500, 
