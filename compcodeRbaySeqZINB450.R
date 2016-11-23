@@ -12,7 +12,7 @@ library(edgeR)
 library(data.table)
 #------------------------------------------------------------------------------
 
-if(require("parallel")) cl <- makeCluster(16) else cl <- NULL
+if(require("parallel")) cl <- makeCluster(32) else cl <- NULL
 
 
 ##### Zero-Inflated Negative Binomial prior group. #####
