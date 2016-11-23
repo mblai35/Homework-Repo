@@ -4,15 +4,15 @@
 # Simulating differential gene expression data to evaluate baySeq's ability to
 # detect differentially expressed genes. 
 #------------------------------------------------------------------------------
-source("https://bioconductor.org/biocLite.R")
-biocLite("compcodeR")
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("compcodeR")
 library(compcodeR)
 library(baySeq)
 library(edgeR)
 library(data.table)
 #------------------------------------------------------------------------------
 
-if(require("parallel")) cl <- makeCluster(8) else cl <- NULL
+if(require("parallel")) cl <- makeCluster(32) else cl <- NULL
 
 start <- proc.time()
 
