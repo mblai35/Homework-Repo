@@ -8,79 +8,57 @@
 #------------------------------------------------------------------------------
 library(moments)
 
-#setwd("/Users/mblai/Documents/GitHub/Homework-Repo")
-
 # Read in input for the Negative Binomial (NB) prior and the Zero-Inflated Negative
 # Binomial (ZINB) prior. 
-NB <- read.csv(file = "compcodebaySeqOUT.csv")
-ZINB <- read.csv(file = "compcodebaySeqZINBout.csv")
+NB <- read.csv(file.choose())
+ZINB <- read.csv(file.choose())
 
-# Create summary statistics for each distribution.
-# NB:
+# Create a filtered PDF with filter width of .035 for each prior.
+plot(density(NB$Correct.DE, width = .035), ylab = 'PDF', xlab = 'Proportion Correct', 
+     main = 'Correctly Identified Genes', type = 'n')
+lines(density(NB$Correct.DE, width = .035))
+lines(density(ZINB$Correct.DE, width = .035), lty = 2)
+legend('topleft', c('NB', 'ZINB'), lty = c(1,2))
+
+# Calculate statistics for each prior. 
+# mean
+mean(ZINB$Correct.DE)
 mean(NB$Correct.DE)
-sd(NB$Correct.DE)
+# variance
+var(ZINB$Correct.DE)
+var(NB$Correct.DE)
 
-# Create a filtered PDF with varying filter widths for the NB prior.
-plot(density(NB$Correct.DE, width = .01), ylab = 'PDF', xlab = 'x', main = '', type = 'n')
-lines(density(NB$Correct.DE, width = .01), ylab = 'PDF', xlab = 'x', main = '')
-lines(density(NB$Correct.DE, width = .03), ylab = 'PDF', xlab = 'x', main = '')
+# Merge NB and ZINB data. 
+total <- rbind(NB, ZINB)
 
+# Plot filtered PDF for combined NB and ZINB data.
+plot(density(total$Correct.DE, width = .035), col = 'red')
 
-plot(density(ZINB$Correct.DE, width = .01), ylab = 'PDF', xlab = 'Correctly Identified Genes', main = '', type = "n")
-lines(density(ZINB$Correct.DE, width = .01), ylab = 'PDF', xlab = 'Correctly Identified Genes', main = '')
-lines(density(ZINB$Correct.DE, width = .03), ylab = 'PDF', xlab = 'Correctly Identified Genes', main = '')
-lines(density(ZINB$Correct.DE, width = .05), ylab = 'PDF', xlab = 'Correctly Identified Genes', main = '')
-
-xbar<- mean(ZINB$Correct.DE) 
-xvar <- var(ZINB$Correct.DE)
+# Find alpha and beta for Beta distribution from mean and variance.
+xbar<- mean(total$Correct.DE) 
+xvar <- var(total$Correct.DE)
 
 a <- xbar*(((xbar*(1-xbar))/xvar)-1)
 b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)  
 
-a/(a+b)
-
+# Plot the Beta distribution with the appropriate alpha and beta.
 x <- seq(0, 1, by = .001)
 lines(x, dbeta(x, shape1 = a, shape2 = b))
-abline(v=xbar)
 
-plot(density(ZINB$Correct.DE))
-
-lines(density(ZINB$Correct.DE, width = .3), ylab = 'f', xlab = 'x', main = '')
-plot(density(ZINB$Correct.DE))
-
-
-kurtosis(ZINB$Correct.DE)
-
-mean(ZINB$Correct.DE)
-mean(NB$Correct.DE)
-
-var(ZINB$Correct.DE)
-var(NB$Correct.DE)
-
-nbzinb <- c(NB$Correct.DE, ZINB$Correct.DE)
-plot(density(nbzinb))
-
-
-
-xbar<- mean(nbzinb) 
-xvar <- var(nbzinb)
-
+# Find mode. 
 getmode <- function(v) {
   uniqv <- unique(v)
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
-xmode <- getmode(nbzinb)
+xmode <- getmode(total$Correct.DE)
 
 b <- (1 - xbar)*(((xbar*(1 - xbar))/xvar)-1)
 a <- (xmode*b - 2*xmode + 1)/(1 - xmode) 
 #a <- xbar*(((xbar*(1-xbar))/xvar)-1)
-  
+
 x <- seq(0, 1, by = .001)
-lines(x, dbeta(x, shape1 = a, shape2 = b))
+lines(x, dbeta(x, shape1 = a, shape2 = b), lty =2)
 abline(v=xbar)
 
-ZINB200 <- read.csv(file.choose())
-lines(density(zinb), col = 'blue')
-zinb <- c(zinb, NB$Correct.DE)
 
