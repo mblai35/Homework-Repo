@@ -50,16 +50,36 @@ colnames(statistics) <- c('Mean', 'Variance')
 # Create a table holding the priors' stats.
 kable(statistics)
 ```
-&nbsp;
 
 &nbsp;
 
 ```{r, echo = F}  
-plot(density(NB$Correct.DE, width = .035), ylab = 'PDF', 
+plot(density(ZINB$Correct.DE, width = .035), ylab = 'PDF', 
      xlab = 'Proportion Correct', main = 'Correctly Identified Genes', type = 'n')
 lines(density(NB$Correct.DE, width = .035))
 lines(density(ZINB$Correct.DE, width = .035), lty = 2)
 legend('topleft', c('NB', 'ZINB'), lty = c(1,2))
+```
+
+```{r, echo = F}
+# Merge NB and ZINB data. 
+total <- rbind(NB, ZINB)
+plot(density(total$Correct.DE, width = .035), col = 'red')
+
+# Plot filtered PDF for combined NB and ZINB data.
+plot(density(total$Correct.DE, width = .035), col = 'red')
+
+# Find alpha and beta for Beta distribution from mean and variance.
+xbar<- mean(total$Correct.DE) 
+xvar <- var(total$Correct.DE)
+
+a <- xbar*(((xbar*(1-xbar))/xvar)-1)
+b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)  
+
+# Plot the Beta distribution with the appropriate alpha and beta.
+x <- seq(0, 1, by = .001)
+lines(x, dbeta(x, shape1 = a, shape2 = b))
+
 ```
 
 #### Discussion  

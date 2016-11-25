@@ -62,6 +62,9 @@ for (i in 1:100)
   
   ##### baySeq analysis #####
   
+  # Print iteration number.
+  (i)
+  
   # Create count data object. 
   countData <- new('countData', data = simGenes, replicates = sampAnnotations$condition, 
                    groups = list(NDE = rep(1, length(sampAnnotations$condition)), 
@@ -122,7 +125,7 @@ for (i in 1:100)
 }
 
 # Write results table to a csv file. 
-write.csv(resultsMatrix, file = "compcodebaySeqNBout.csv")
+write.csv(resultsMatrix, file = "compcodebaySeqNB300out.csv")
 
 
 ##### Zero-Inflated Negative Binomial prior group. #####
@@ -172,6 +175,9 @@ for (i in 1:100)
   sampAnnotations <- sim@sample.annotations
   
   ##### baySeq analysis #####
+  
+  # Print iteration number.
+  (i)
   
   # Create count data object. 
   countData <- new('countData', data = simGenes, replicates = sampAnnotations$condition, 
@@ -236,7 +242,7 @@ for (i in 1:100)
 
 # Write results table to a csv file. 
 write.csv(resultsMatrix, 
-          file = "compcodebaySeqZINBout.csv")
+          file = "compcodebaySeqZINB300out.csv")
 
 
 

@@ -14,7 +14,7 @@ NB <- read.csv(file.choose())
 ZINB <- read.csv(file.choose())
 
 # Create a filtered PDF with filter width of .035 for each prior.
-plot(density(NB$Correct.DE, width = .035), ylab = 'PDF', xlab = 'Proportion Correct', 
+plot(density(ZINB$Correct.DE, width = .035), ylab = 'PDF', xlab = 'Proportion Correct', 
      main = 'Correctly Identified Genes', type = 'n')
 lines(density(NB$Correct.DE, width = .035))
 lines(density(ZINB$Correct.DE, width = .035), lty = 2)
@@ -30,9 +30,7 @@ var(NB$Correct.DE)
 
 # Merge NB and ZINB data. 
 total <- rbind(NB, ZINB)
-
-# Plot filtered PDF for combined NB and ZINB data.
-plot(density(total$Correct.DE, width = .035), col = 'red')
+lines(density(total$Correct.DE, width = .035), col = 'red')
 
 # Find alpha and beta for Beta distribution from mean and variance.
 xbar<- mean(total$Correct.DE) 
@@ -41,9 +39,12 @@ xvar <- var(total$Correct.DE)
 a <- xbar*(((xbar*(1-xbar))/xvar)-1)
 b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)  
 
-# Plot the Beta distribution with the appropriate alpha and beta.
+# Plot filtered PDF for combined NB and ZINB data with Beta distribution.
 x <- seq(0, 1, by = .001)
+plot(x, dbeta(x, shape1 = a, shape2 = b), type = 'n', xlim = c(0, .6))
 lines(x, dbeta(x, shape1 = a, shape2 = b))
+lines(density(total$Correct.DE, width = .035), col = 'red')
+
 
 # Find mode. 
 getmode <- function(v) {
@@ -57,8 +58,57 @@ b <- (1 - xbar)*(((xbar*(1 - xbar))/xvar)-1)
 a <- (xmode*b - 2*xmode + 1)/(1 - xmode) 
 #a <- xbar*(((xbar*(1-xbar))/xvar)-1)
 
+plot(x, dbeta(x, shape1 = a, shape2 = b), type = 'n')
+lines(x, dbeta(x, shape1 = a, shape2 = b))
+lines(density(total$Correct.DE, width = .035), col = 'red')
+
+x <- seq(0, 1, by = .001)
+lines(x, dbeta(x, shape1 = a, shape2 = b), lty =2)
+#abline(v=xbar)
+abline(v=xmode)
+
+xmode <- getmode(NB$Correct.DE)
+
+b <- (1 - xbar)*(((xbar*(1 - xbar))/xvar)-1)
+a <- (xmode*b - 2*xmode + 1)/(1 - xmode) 
+#a <- xbar*(((xbar*(1-xbar))/xvar)-1)
+
 x <- seq(0, 1, by = .001)
 lines(x, dbeta(x, shape1 = a, shape2 = b), lty =2)
 abline(v=xbar)
 
+############################
+
+# Plot percentage of top counts that are differentially expressed. 
+plot(density(total$Correct.TopCounts), ylab = "PDF", xlab = "Proportion", "True Positive Rate")
+
+xbar<- mean(total$Correct.TopCounts) 
+xvar <- var(total$Correct.TopCounts)
+
+a <- xbar*(((xbar*(1-xbar))/xvar)-1)
+b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)  
+
+# Plot the Beta distribution with the appropriate alpha and beta.
+x <- seq(0, 1, by = .001)
+lines(x, dbeta(x, shape1 = a, shape2 = b), lty = 2)
+
+# Plot
+plot(x, dbeta(x, shape1 = a, shape2 = b), lty = 2, xlim = c(.3,1), type = 'l', 
+     ylab = "PDF", xlab = "Proportion", main ="True Positive Rate")
+lines(density(total$Correct.TopCounts))
+
+
+# Plot filtered PDF for NB.
+plot(density(NB$Correct.DE, width = .035), col = 'red')
+
+# Find alpha and beta for Beta distribution from mean and variance.
+xbar<- mean(NB$Correct.DE) 
+xvar <- var(NB$Correct.DE)
+
+a <- xbar*(((xbar*(1-xbar))/xvar)-1)
+b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)  
+
+# Plot the Beta distribution with the appropriate alpha and beta.
+x <- seq(0, 1, by = .001)
+lines(x, dbeta(x, shape1 = a, shape2 = b))
 
