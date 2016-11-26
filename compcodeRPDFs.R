@@ -41,10 +41,11 @@ b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)
 
 # Plot filtered PDF for combined NB and ZINB data with Beta distribution.
 x <- seq(0, 1, by = .001)
-plot(x, dbeta(x, shape1 = a, shape2 = b), type = 'n', xlim = c(0, .6))
-lines(x, dbeta(x, shape1 = a, shape2 = b))
-lines(density(total$Correct.DE, width = .035), col = 'red')
-
+plot(x, dbeta(x, shape1 = round(a), shape2 = round(b)), 
+     xlab = 'Proportion', ylab = 'PDF', main = 'True DE Genes Detected', type = 'n')
+lines(density(total$Correct.DE, width = .035))
+lines(x, dbeta(x, shape1 = round(a), shape2 = round(b)), lty = 2)
+legend('topright', c('Filtered PDF', 'Beta(46, 141)'), lty = c(1,2))
 
 # Find mode. 
 getmode <- function(v) {
@@ -67,13 +68,17 @@ lines(x, dbeta(x, shape1 = a, shape2 = b), lty =2)
 #abline(v=xbar)
 abline(v=xmode)
 
-xmode <- getmode(NB$Correct.DE)
+xmode <- getmode(total$Correct.DE)
 
 b <- (1 - xbar)*(((xbar*(1 - xbar))/xvar)-1)
 a <- (xmode*b - 2*xmode + 1)/(1 - xmode) 
 #a <- xbar*(((xbar*(1-xbar))/xvar)-1)
 
 x <- seq(0, 1, by = .001)
+plot(x, dbeta(x, shape1 = a, shape2 = b), type = 'n')
+lines(x, dbeta(x, shape1 = a, shape2 = b))
+lines(density(total$Correct.DE, width = .035), col = 'red')
+
 lines(x, dbeta(x, shape1 = a, shape2 = b), lty =2)
 abline(v=xbar)
 
@@ -110,5 +115,7 @@ b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)
 
 # Plot the Beta distribution with the appropriate alpha and beta.
 x <- seq(0, 1, by = .001)
-lines(x, dbeta(x, shape1 = a, shape2 = b))
+plot(x, dbeta(x, shape1 = a, shape2 = b), type = 'l')
+lines(density(NB$Correct.DE, width = .035), col = 'red')
+
 
