@@ -3,42 +3,41 @@ title: Evaluating baySeq's differential gene expression analysis of RNA-Seq data
   compcodeR
 author: "Mallory Lai"
 date: "November 17, 2016"
-output: html_document
+output: pdf_document
 ---
 ```{r, echo = F,  message = F, warning=F}
 library(knitr)
 ```
 
-Although several statistical methods have been used to examine RNA-Seq count data, no standard method exists. baySeq is an R package that analyzes RNA-Seq data in a Bayesian context. By default, the method assumes a Negative Binomial (NB) distribution as its prior and calculates a posterior probability that each gene is differentially expressed. Although it's known to have a low False Discovery Rate (FDR), it's computationally intensive and relatively conservative. 
+Although several statistical methods have been used to examine differential gene expression through RNA-Seq count data, no standard method exists. baySeq is an R package that analyzes RNA-Seq data in a Bayesian context. By default, the method assumes a Negative Binomial (NB) distribution as its prior and calculates a posterior probability that each gene is differentially expressed. Although it's known to have a low false discovery rate, it's computationally intensive and relatively conservative in terms of identifying differentially expressed genes. 
 
-The goal here is to investigate just how conservative such analyses are, since error and assumptions made at this stage can greatly affect downstream analyses. The project's aim is to quantify the proportion of accurately predicted differentially expressed genes and its False Discovery Rate using baySeq with simulated RNA-Seq count data. I will use the default Negative Binomial distribution as a prior as well as the user-specified Zero-Inflated Negative Binomial (ZINB). 
+The goal here is to investigate just how conservative such analyses are, since error and assumptions made at this stage can greatly affect downstream analyses. The project's aim is to quantify the proportion of accurately predicted differentially expressed genes and its true positive rate using baySeq with simulated RNA-Seq count data through compcodeR. The default Negative Binomial distribution will be used as a prior as well as the user-specified Zero-Inflated Negative Binomial (ZINB) for comparison. 
 
 #### Methods
 &nbsp;
 
-  Simulated RNA-Seq data was produced using the compcodeR package and differential gene expression was analyzed using the baySeq package. Three thousand simulations were performed in total. Half of them were analyzed with a Negative Binomial prior in baySeq and the other half with a Zero-Inflated Negative Binomial. Total computation time was ~90 h with parallel processing using the parallel package in R. Approximately 72 hours of computational time was performed on a Windows 10 desktop and ~18 hours was performed on the cluster computer Mt. Moran in Laramie, WY. 
+  Simulated RNA-Seq data was produced using the compcodeR package and differential gene expression was analyzed using the baySeq package. Three thousand simulations were performed in total. Half of them were analyzed with baySeq using an NB prior and the other half with a ZINB prior. Total computation time was ~90 h with parallel processing using the parallel package in R. Approximately 72 hours of computational time was performed on a Windows 10 desktop and ~18 hours was performed on the cluster computer Mt. Moran in Laramie, WY. 
 
   The compcodeR package was used to produce simulated RNA-Seq count data for two groups of five samples each. Counts were simulated from a Negative Binomial distribution with equal dispersion between the two groups. Simulated data was automatically filtered to exclude genes with values of zero among all five samples. No outliers were introduced. For each simulation, a random number of genes between 8,000 and 12,500 (the maximum allowed) was tested. A random percentage of those genes, between 5-30%, were selected to be differentially expressed. The fraction of differentially expressed genes to be upregulated was also randomized to be a proportion between .45 and .65.  
 
-  Differential gene expression was then analyzed using the baySeq package. Differentially expressed genes (DE genes) from baySeq were classified as genes with a posterior likelihood greater than .95. True DE genes were defined as the genes simulated to be upregulated or downregulated by compcodeR. A detection of a True DE gene by baySeq required the correct id
+  Differential gene expression was then analyzed using the baySeq package. Differentially expressed genes (DE genes) from baySeq were classified as genes with a posterior likelihood greater than .95, whereas true DE genes were defined as the genes simulated to be upregulated or downregulated by compcodeR. The detection of a true DE gene by baySeq required the correct identification of upregulation or downregulation. A true positive rate was defined as the proportion of true DE genes out of the the total DE genes detected by baySeq. The detection rate is the number of true DE genes detected by baySeq divided by the total number of true DE genes determined by compcodeR, indicating the proportion of true DE genes baySeq was able to detect.   
   
-  Accurately classified genes were defined as those which correctly identified upregulation or downregulation with a  True Positive Rates were defined as the proportion of accurately classified genes out of the
-  
-  The proportion of accurately classified genes for each simulation was then calculated by dividing the number of accurately classified genes by the number of differentially expressed genes defined by compcodeR. A filtered probability density function (PDF) of the proportion of accurately classified genes was created for the NB and ZINB groups. The filter width was chosen to minimize noise without spreading the PDF out too much. 
-
-  A Beta PDF was fit to the data. The Beta distribution was used since the proportion of correctly classified genes is bounded between 0 and 1. The parameters $\alpha$ and $\beta$ were calculated from the mean and variance of the data:   
+  A filtered probability density function (PDF) of the detection rate and true positive rate was created for the NB and ZINB groups. The filter width was chosen to minimize noise without spreading the PDF out too much. A Beta PDF was then fit to both PDFs. The Beta distribution was used since the proportion of correctly classified genes is bounded between 0 and 1. Parameters $\alpha$ and $\beta$ were calculated from the mean and variance of the data with the following equations:   
   $$\alpha = \left< X \right> \left[ \frac{\left<X\right>(1-\left<X\right>)}{\left<\tilde{X^2}\right>}-1  \right]$$ 
  $$ \beta = (1-\left<X\right>) \left[ \frac{\left<X\right>(1-\left<X\right>)}{\left<\tilde{X^2}\right>}-1  \right]$$
 
 #### Results  
 &nbsp;
 
+  Various filtered PDFs were created for the detection rate of both NB and ZINB groups. A filter width of 0.035 was determined to provide the best shape for the PDF--minimizing noise without spreading out the PDF too much. No significant differences between the NB and ZINB priors were found. Both the mean and variance was similar amongst both groups. 
+  
 ```{r, echo = F}
 NB <- read.csv(file = 'compcodeRbaySeqNB.csv')
 ZINB <- read.csv(file = 'compcodeRbaySeqZINB.csv')
 ```
-  No significant differences between the NB and ZINB priors were found. Both the mean and variance was similar amongst both groups. Because no significant differences were found between the NB and ZINB priors, the data was combined to form one PDF. 
+  
 ```{r, echo = F}
+#### Calculate DR statistics for each prior and put in a table.
 # Create a matrix holding the mean and variance for the NB and ZINB priors.
 statistics <- matrix(c(mean(ZINB$Correct.DE), mean(NB$Correct.DE), var(ZINB$Correct.DE), var(NB$Correct.DE)), nrow = 2)
 
@@ -52,47 +51,102 @@ colnames(statistics) <- c('Mean', 'Variance')
 kable(statistics)
 ```
 
-&nbsp;
-
 ```{r, echo = F}  
-plot(density(ZINB$Correct.DE, width = .035), ylab = 'PDF', 
-     xlab = 'Proportion Correct', main = 'True DE Genes Detected', type = 'n')
-lines(density(NB$Correct.DE, width = .035))
-lines(density(ZINB$Correct.DE, width = .035), lty = 2)
-legend('topleft', c('NB', 'ZINB'), lty = c(1,2))
+#### Create a filtered PDF for DR with filter width of .035 for each prior.
+# Initialize plot.
+plot(density(ZINB$Correct.DE, width = .035), ylab = 'PDF', xlab = 'Detection Rate',
+     main = 'Proportion of True DE Genes Detected', xlim = c(0.1, .35),
+      type = 'n') 
+
+# Add NB prior filtered PDF.
+lines(density(NB$Correct.DE, width = .035)) 
+
+# Add ZINB prior filtered PDF.
+lines(density(ZINB$Correct.DE, width = .035), lty = 5) 
+
+# Add legend.
+legend('topleft', c('NB', 'ZINB'), lty = c(1,5)) 
 ```
 
-The parameters $\alpha$ and $\beta$ were calculated from the combined output to yield a Beta PDF with $\alpha \approx 46$ and $\beta \approx 141$. 
-
+Because no significant differences were found between the NB and ZINB priors, the data was combined to form one PDF. The parameters $\alpha$ and $\beta$ were calculated from the combined output to yield a Beta PDF with $\alpha \approx 46$ and $\beta \approx 141$. The filtered PDF was plotted against the Beta(46, 141) PDF for comparison. 
 
 ```{r, echo = F}
+#### Fit Beta PDF to combined filtered PDF
 # Merge NB and ZINB data. 
 total <- rbind(NB, ZINB)
 
 # Find alpha and beta for Beta distribution from mean and variance.
+# Calculate mean.
 xbar<- mean(total$Correct.DE) 
+
+# Calculate variance.
 xvar <- var(total$Correct.DE)
 
+# Calculate alpha.
 a <- xbar*(((xbar*(1-xbar))/xvar)-1)
+
+# Calculate beta. 
 b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)  
 
 # Plot filtered PDF for combined NB and ZINB data with Beta distribution.
+# Initialize a sequence of values between 0 and 1 to plot.
 x <- seq(0, 1, by = .001)
-plot(x, dbeta(x, shape1 = round(a), shape2 = round(b)), 
-     xlab = 'Proportion', ylab = 'PDF', main = 'True DE Genes Detected', type = 'n')
-lines(density(total$Correct.DE, width = .035))
-lines(x, dbeta(x, shape1 = round(a), shape2 = round(b)), lty = 2)
-legend('topright', c('Filtered PDF', 'Beta(46, 141)'), lty = c(1,2))
 
+# Initalize plot. 
+plot(x, dbeta(x, shape1 = round(a), shape2 = round(b)), 
+     main = 'Proportion of True DE Genes Detected', ylab = 'PDF', 
+     xlab = 'Detection Rate', type = 'n')
+
+# Plot filtered PDF for combined NB and ZINB prior.
+lines(density(total$Correct.DE, width = .035))
+
+# Plot Beta PDF.
+lines(x, dbeta(x, shape1 = round(a), shape2 = round(b)), lty = 2)
+
+# Add legend.
+legend('topright', c('Filtered PDF', 'Beta(46, 141)'), lty = c(1,2))
+```
+
+ A filtered PDF was also created for the true positive rate for the combined NB and ZINB groups. Again, a filter width of 0.035 was found to be optimal. The average true positive rate was found to be ~98%. Here, the parameters $\alpha$ and $\beta$ were calculated to yield a Beta PDF with $\alpha \approx 227$ and $\beta \approx 5$. The Beta(227, 5) and filtered PDF were plotted against each other for comparison.
+
+```{r, echo = F}
+#### Find alpha and beta for Beta distribution from mean and variance for TPR.
+# Calculate mean.
+xbar<- mean(total$Correct.TopCounts) 
+
+# Calculate variance. 
+xvar <- var(total$Correct.TopCounts)
+
+# Calculate alpha.
+a <- xbar*(((xbar*(1-xbar))/xvar)-1)
+
+# Calculate beta.
+b <- (1-xbar)*(((xbar*(1-xbar))/xvar)-1)  
+
+#### Plot the Beta distribution with the appropriate alpha and beta.
+# Initialize a sequence of values between 0 and 1 to plot.
+x <- seq(0, 1, by = .001)
+
+# Plot Beta PDF for TPR.
+plot(x, dbeta(x, shape1 = round(a), shape2 = round(b)), lty = 2, xlim = c(.9, 1),
+     ylim = c(0, 60), type = 'l', 
+     ylab = "PDF", xlab = "Proportion", main ="True Positive Rate")
+
+# Add Filtered PDF from combined NB and ZINB prior.
+lines(density(total$Correct.TopCounts))
+
+# Add legend.
+legend('topleft', c('Filtered PDF', 'Beta(227, 5)'), lty = c(1,2)) 
 ```
 
 #### Discussion  
 &nbsp;
 
-Although the FDR for baySeq is indeed quite low, the proportion of accurately identified genes is low with a large computational cost. Other packages, such as edgeR or DEseq, although not Bayesian in nature, outperform baySeq in terms of both computational cost and number of genes detected.
+Although not perfect, the Beta PDFs describe the detection rate and true positive rate for baySeq reasonably well. The Beta(46, 141) slightly overpredicts detection rate near the filtered PDF's peak. The Beta(227,5) does the opposite--underpredicting the true positive rate near its peak. However, it is possible that with more simulations the filtered PDF may come closer to resembling the Beta PDFs. 
 
-Further research should center on the accurate classification of differentially expression genes under a wider range of simulated conditions. Simulations with more than two groups and varying replicate numbers should be considered. The number of genes, the proportion of differentially expressed genes, and the fraction of upregulated genes should include a wider range of variables. Simulations which involve no differentially expressed genes and only upregulated or downregulated genes should be considered as well. Without such conditions, these results cannot be considered robust and generalizable to the conditions not tested. 
+Further research could center on the accurate classification of differentially expression genes under a wider range of simulated conditions. Simulations with more than two groups and varying replicate numbers should be considered. The number of genes, the proportion of differentially expressed genes, and the fraction of upregulated genes should also include a wider range of variables. Simulations which involve no differentially expressed genes and only upregulated or downregulated genes should be considered as well. Without such conditions, these results cannot be considered robust and generalizable to the conditions not tested. 
 
+Although the true positive rate of ~98% for baySeq is indeed quite high, the detection rate of ~25% is low with a large computational cost. Other packages, such as edgeR or DEseq, although not Bayesian in nature, outperform baySeq in terms of both computational cost and detection rate. It is possible that lowering the threshold for significance of the posterior likelihood could bring detection rates up while keeping the true positive rate within a reasonable limit. However, until detection rates can be improved, it may be better to use a less computationally intensive package for differential gene expression analysis.
 
 
 
