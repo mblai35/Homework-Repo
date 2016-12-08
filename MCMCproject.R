@@ -95,7 +95,7 @@ for (i in 1:steps)
 }
 
 # Plot bar chart of states.
-(qplot1 <- qplot(Chain2, data = movesMatrix, geom = "bar",
+(qplot2 <- qplot(Chain2, data = movesMatrix, geom = "bar",
                  xlab = "State", fill = factor(Chain2)))
 
 
@@ -113,12 +113,131 @@ plot2
 dev.off()
 
 # Set dimensions for qplot1 TIFF file.
-tiff("BarChartStatesEx1.tiff", width = 4, height = 3, 
+tiff("BarChartStatesEx2.tiff", width = 4, height = 3, 
      units = 'in', res = 300)
 # Write plot to TIFF file. 
-qplot1
+qplot2
 # Reset plotting environment. 
 dev.off()
+
+### Now up the number of steps:
+set.seed(3)
+# Number of steps for algorithm to make.
+steps <- 1000
+# Initial position. 
+current <- 3
+# Initialize vector to store moves. 
+movesMatrix <- matrix(rep(0, steps*2), ncol = 2)
+# Name movesMatrix columns.
+colnames(movesMatrix) <- c('TimeStep', 'State')
+
+# Metropolis algorithm:
+for (i in 1:steps)
+{
+  # Record current time step.
+  movesMatrix[i, 1] <- i
+  
+  # Record current position.
+  movesMatrix[i, 2] <- current
+  
+  # Simulate proposal to left or right with coin flip.
+  proposal <- current + sample(c(-1, 1), size = 1)
+  # Account for edges:
+  if (proposal < 1) proposal <- 1
+  if (proposal > 5) proposal <- 5
+  
+  # Probability of moving to proposed position.
+  prob <- proposal/current
+  current <- ifelse(runif(1) < prob, proposal, current)
+  
+}
+
+#### Plot movement over time. 
+# Convert matrix to data.frame for ggplot2.
+movesMatrix <- data.frame(movesMatrix)
+# Plot TimeStep as y-axis and State as x-axis and store as plot1.
+(plot3 <- ggplot(movesMatrix, aes(State, TimeStep)) + geom_path())
+# Plot bar chart of states.
+(qplot3 <- qplot(State, data = movesMatrix, geom = "bar",
+                 xlab = "State", fill = factor(State)))
+
+### Write plots to file for presentation: 
+# Set dimensions for plot1 TIFF file.
+tiff("MovesStatesEx3.tiff", width = 4, height = 8, 
+     units = 'in', res = 300)
+# Write plot to TIFF file. 
+plot3
+# Reset plotting environment. 
+dev.off()
+
+# Set dimensions for qplot1 TIFF file.
+tiff("BarChartStatesEx3.tiff", width = 4, height = 3, 
+     units = 'in', res = 300)
+# Write plot to TIFF file. 
+qplot3
+# Reset plotting environment. 
+dev.off()
+
+### Now up the number of steps AGAIN:
+set.seed(3)
+# Number of steps for algorithm to make.
+steps <- 10000
+# Initial position. 
+current <- 3
+# Initialize vector to store moves. 
+movesMatrix <- matrix(rep(0, steps*2), ncol = 2)
+# Name movesMatrix columns.
+colnames(movesMatrix) <- c('TimeStep', 'State')
+
+# Metropolis algorithm:
+for (i in 1:steps)
+{
+  # Record current time step.
+  movesMatrix[i, 1] <- i
+  
+  # Record current position.
+  movesMatrix[i, 2] <- current
+  
+  # Simulate proposal to left or right with coin flip.
+  proposal <- current + sample(c(-1, 1), size = 1)
+  # Account for edges:
+  if (proposal < 1) proposal <- 1
+  if (proposal > 5) proposal <- 5
+  
+  # Probability of moving to proposed position.
+  prob <- proposal/current
+  current <- ifelse(runif(1) < prob, proposal, current)
+  
+}
+
+#### Plot movement over time. 
+# Convert matrix to data.frame for ggplot2.
+movesMatrix <- data.frame(movesMatrix)
+# Plot TimeStep as y-axis and State as x-axis and store as plot1.
+(plot4 <- ggplot(movesMatrix, aes(State, TimeStep)) + geom_path())
+# Plot bar chart of states.
+(qplot4 <- qplot(State, data = movesMatrix, geom = "bar",
+                 xlab = "State", fill = factor(State)))
+
+### Write plots to file for presentation: 
+# Set dimensions for plot1 TIFF file.
+tiff("MovesStatesEx4.tiff", width = 4, height = 8, 
+     units = 'in', res = 300)
+# Write plot to TIFF file. 
+plot4
+# Reset plotting environment. 
+dev.off()
+
+# Set dimensions for qplot1 TIFF file.
+tiff("BarChartStatesEx4.tiff", width = 4, height = 3, 
+     units = 'in', res = 300)
+# Write plot to TIFF file. 
+qplot4
+# Reset plotting environment. 
+dev.off()
+
+
+
 
 
 # Create transition matrix

@@ -1,0 +1,11 @@
+model{
+for(i in 1:length(gs))
+{
+  A[i]~dnorm(a[i], tau)
+  a[i]<-beta0+beta1*gs[i]
+}
+beta0 ~dnorm(0, 1*10^(-6))
+beta1 ~dnorm(0, 1*10^(-6))
+tau ~dgamma(.001,.001)
+sigma<- 1/sqrt(tau)
+}
