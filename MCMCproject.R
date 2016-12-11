@@ -163,20 +163,76 @@ movesMatrix <- data.frame(movesMatrix)
 
 ### Write plots to file for presentation: 
 # Set dimensions for plot1 TIFF file.
-tiff("MovesStatesEx3.tiff", width = 4, height = 8, 
-     units = 'in', res = 300)
+#tiff("MovesStatesEx3.tiff", width = 4, height = 8, 
+#     units = 'in', res = 300)
 # Write plot to TIFF file. 
 plot3
+# Reset plotting environment. 
+#dev.off()
+
+# Set dimensions for qplot1 TIFF file.
+#tiff("BarChartStatesEx3.tiff", width = 4, height = 3, 
+#     units = 'in', res = 300)
+# Write plot to TIFF file. 
+qplot3
+# Reset plotting environment. 
+#dev.off()
+
+## Second chain for 1000 steps
+set.seed(4)
+# Number of steps for algorithm to make.
+steps <- 1000
+# Initial position. 
+current <- 3
+# Initialize vector to store moves. 
+movesMatrix$Chain2 <- c(rep(0, steps))
+
+# Metropolis algorithm:
+for (i in 1:steps)
+{
+  # Record current time step.
+  #movesMatrix[i, 1] <- i
+  
+  # Record current position.
+  movesMatrix[i, 3] <- current
+  
+  # Simulate proposal to left or right with coin flip.
+  proposal <- current + sample(c(-1, 1), size = 1)
+  # Account for edges:
+  if (proposal < 1) proposal <- 1
+  if (proposal > 5) proposal <- 5
+  
+  # Probability of moving to proposed position.
+  prob <- proposal/current
+  current <- ifelse(runif(1) < prob, proposal, current)
+  
+}
+
+# Plot bar chart of states.
+(qplot3.b <- qplot(Chain2, data = movesMatrix, geom = "bar",
+                 xlab = "State", fill = factor(Chain2)))
+
+# Plot movement over time for both chains.  
+(plot3.b <- plot3 + geom_path(data = movesMatrix, 
+                            aes(Chain2, TimeStep, colour = "Chain2")))
+
+### Write plots to file for presentation: 
+# Set dimensions for plot2 TIFF file.
+tiff("MovesStatesEx3.b.tiff", width = 4, height = 8, 
+     units = 'in', res = 300)
+# Write plot to TIFF file. 
+plot3.b
 # Reset plotting environment. 
 dev.off()
 
 # Set dimensions for qplot1 TIFF file.
-tiff("BarChartStatesEx3.tiff", width = 4, height = 3, 
+tiff("BarChartStatesEx3.b.tiff", width = 4, height = 3, 
      units = 'in', res = 300)
 # Write plot to TIFF file. 
-qplot3
+qplot3.b
 # Reset plotting environment. 
 dev.off()
+
 
 ### Now up the number of steps AGAIN:
 set.seed(3)
